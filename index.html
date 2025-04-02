@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тренажёр таблицы умножения</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✖️</text></svg>"
+    />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Montserrat:wght@300;700&family=Poiret+One&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="header">
+      <h1 class="h1">ТАБЛИЦА НА "ОТЛИЧНО"</h1>
+      <h2 class="h2">Онлайн-тренажер умножения</h2>
+      <div class="mode-selector">
+        <button class="mode-btn active" data-mode="multiplication">
+          <i class="fas fa-times"></i> Умножение
+        </button>
+        <button class="mode-btn" data-mode="division">
+          <i class="fas fa-divide"></i> Деление
+        </button>
+        <button class="mode-btn" data-mode="mixed">
+          <i class="fas fa-random"></i> Смешанный
+        </button>
+      </div>
+    </div>
+
+    <div id="container">
+      <div id="left">
+        <div class="container_timer">
+          <div id="timer">
+            01:00
+            <button class="btn_timer">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              Старт
+            </button>
+          </div>
+        </div>
+
+        <div class="container_praxis">
+          <div id="praxis">
+            <span id="question"></span>
+            <input
+              type="number"
+              id="answer"
+              oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            />
+            <span id="resultIcon"></span>
+          </div>
+          <button class="btn_praxis">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            ответить
+          </button>
+        </div>
+
+        <div class="container_score">
+          <div class="result">
+            <div class="result_right">
+              Верно: <span id="result_right">0</span>
+            </div>
+            <div class="result_wrong">
+              Неверно: <span id="result_wrong">0</span>
+            </div>
+          </div>
+          <p id="text_result"></p>
+        </div>
+      </div>
+
+      <div id="right">
+        <img id="image" src="assets/images/kids.jpg" alt="kids" />
+      </div>
+    </div>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
