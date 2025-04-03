@@ -4,38 +4,48 @@
   --accent-color: #5a8c4a;
   --text-color: #333;
   --bg-color: #f9f9f9;
+  --error-color: #ff4757;
+  --success-color: #2ed573;
+}
+
+/* Базовые сбросы */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
-  margin: 0;
+  line-height: 1.6;
   padding: 20px;
-  transition: background 0.3s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Шапка */
 #header {
   text-align: center;
   margin-bottom: 30px;
-  animation: fadeIn 0.5s ease-out;
 }
 
 .h1 {
   font-family: "Bungee Spice", cursive;
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
   margin-bottom: 10px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .h2 {
   font-family: "Poiret One", cursive;
-  font-size: 1.8rem;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
   margin: 10px 0 20px;
   color: var(--secondary-color);
-  transition: all 0.3s;
 }
 
+/* Выбор режима */
 .mode-selector {
   display: flex;
   justify-content: center;
@@ -51,10 +61,8 @@ body {
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  font-family: "Montserrat", sans-serif;
   font-weight: bold;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -62,15 +70,11 @@ body {
 
 .mode-btn.active {
   background: var(--primary-color);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.mode-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-}
-
+/* Основной контейнер */
 #container {
   display: flex;
   max-width: 1000px;
@@ -79,14 +83,15 @@ body {
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  animation: slideUp 0.5s ease-out;
 }
 
+/* Левая колонка */
 #left {
   flex: 1;
   padding: 30px;
 }
 
+/* Таймер */
 .container_timer {
   background: rgba(74, 111, 165, 0.1);
   padding: 20px;
@@ -99,15 +104,17 @@ body {
   font-size: 2.5rem;
   font-weight: bold;
   color: var(--secondary-color);
+  margin-bottom: 15px;
   font-family: "Montserrat", sans-serif;
 }
 
+/* Кнопка Старт */
 .btn_timer {
   position: relative;
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
   padding: 12px 30px;
-  margin: 10px 0;
-  margin-left: 30px;
   color: #fff;
   text-decoration: none;
   text-transform: uppercase;
@@ -122,6 +129,7 @@ body {
   transition: all 0.3s;
 }
 
+/* Анимация кнопки */
 .btn_timer span {
   position: absolute;
   display: block;
@@ -206,6 +214,7 @@ body {
   }
 }
 
+/* Практическая часть */
 .container_praxis {
   background: rgba(255, 107, 107, 0.1);
   padding: 20px;
@@ -227,12 +236,18 @@ body {
 }
 
 #answer {
-  width: 60px;
-  height: 40px;
+  width: 80px;
+  height: 45px;
   font-size: 1.2rem;
   text-align: center;
   border: 2px solid #ddd;
-  border-radius: 5px;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+}
+
+#answer:focus {
+  border-color: var(--secondary-color);
+  outline: none;
 }
 
 #resultIcon {
@@ -241,9 +256,11 @@ body {
   text-align: center;
 }
 
+/* Кнопка Ответить */
 .btn_praxis {
   position: relative;
   display: block;
+  width: fit-content;
   margin: 0 auto;
   padding: 12px 30px;
   color: #fff;
@@ -259,9 +276,10 @@ body {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Результаты */
 .container_score {
   text-align: center;
-  padding: 15px;
+  padding: 20px;
   background: rgba(90, 140, 74, 0.1);
   border-radius: 15px;
 }
@@ -275,28 +293,30 @@ body {
 }
 
 .result_right {
-  color: #5a8c4a;
+  color: var(--accent-color);
   font-weight: bold;
 }
 
 .result_wrong {
-  color: #ff6b6b;
+  color: var(--primary-color);
   font-weight: bold;
 }
 
 #text_result {
   font-size: 1.3rem;
   margin: 10px 0 0;
-  min-height: 24px;
+  font-weight: bold;
 }
 
+/* Правая колонка */
 #right {
-  flex: 0 0 40%;
+  flex: 0 0 50%;
   background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
 }
 
 #image {
@@ -305,39 +325,65 @@ body {
   filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Ошибки */
+#mistakes-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  background: #f5f5f5;
+  overflow-y: auto;
+  display: none;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+#mistakes-container.visible {
+  display: block;
 }
 
+#mistakes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.mistake-item {
+  background: rgba(255, 107, 107, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid var(--error-color);
+}
+
+.mistake-item .wrong {
+  color: var(--error-color);
+  font-weight: bold;
+}
+
+.mistake-item .correct {
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+/* Мобильные ошибки */
+#mobile-mistakes-container {
+  display: none;
+  width: 100%;
+  padding: 20px;
+  background: #f5f5f5;
+  margin-top: 20px;
+  border-radius: 15px;
+}
+
+#mobile-mistakes-container.visible {
+  display: block;
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
   #container {
     flex-direction: column;
-  }
-
-  .mode-selector {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .mode-btn {
-    width: 80%;
-    justify-content: center;
   }
 
   #right {
@@ -350,5 +396,44 @@ body {
 
   .h2 {
     font-size: 1.5rem;
+  }
+
+  .mode-selector {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mode-btn {
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
+
+  #left {
+    padding: 20px;
+  }
+
+  .container_timer,
+  .container_praxis,
+  .container_score {
+    padding: 15px;
+  }
+
+  #praxis {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 15px;
+  }
+
+  .btn_timer,
+  .btn_praxis {
+    padding: 10px 20px;
+    font-size: 1rem;
   }
 }

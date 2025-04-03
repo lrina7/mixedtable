@@ -1,210 +1,285 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Элементы интерфейса
-  const timerDisplay = document.getElementById("timer");
+  // Получаем элементы
+  const timerElement = document.getElementById("timer");
   const startButton = document.querySelector(".btn_timer");
-  const answerButton = document.querySelector(".btn_praxis");
-  const answerInput = document.getElementById("answer");
   const questionElement = document.getElementById("question");
+  const answerInput = document.getElementById("answer");
+  const answerButton = document.querySelector(".btn_praxis");
   const resultIcon = document.getElementById("resultIcon");
-  const resultRight = document.getElementById("result_right");
-  const resultWrong = document.getElementById("result_wrong");
-  const textResult = document.getElementById("text_result");
+  const rightAnswersElement = document.getElementById("result_right");
+  const wrongAnswersElement = document.getElementById("result_wrong");
+  const resultTextElement = document.getElementById("text_result");
+  const imageContainer = document.getElementById("image");
+  const mistakesContainer = document.getElementById("mistakes-container");
+  const mistakesList = document.getElementById("mistakes-list");
 
   // Переменные игры
   let currentMode = "multiplication";
   let currentAnswer;
-  let isTimerExpired = false;
+  let isTimerRunning = false;
   let timerInterval;
-  let durationInSeconds = 60;
+  let timeLeft = 60;
+  let mistakes = [];
 
   // Инициализация кнопок режимов
   document.querySelectorAll(".mode-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
-      setMode(this.dataset.mode);
+      currentMode = this.dataset.mode;
+      document.querySelectorAll(".mode-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.mode === currentMode);
+      });
+      resetGame();
     });
   });
-
-  // Установка режима игры
-  function setMode(mode) {
-    currentMode = mode;
-
-    // Обновляем активные кнопки
-    document.querySelectorAll(".mode-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.mode === mode);
-    });
-
-    // Обновляем заголовок
-    const titles = {
-      multiplication: "Тренажёр умножения",
-      division: "Тренажёр деления",
-      mixed: "Смешанный тренажёр",
-    };
-    document.querySelector(".h2").textContent = titles[mode];
-
-    // Перезапускаем игру
-    resetGame();
-  }
 
   // Генерация вопроса
   function generateQuestion() {
     const num1 = Math.floor(Math.random() * 9) + 1;
     const num2 = Math.floor(Math.random() * 9) + 1;
 
-    switch (currentMode) {
-      case "division":
-        const product = num1 * num2;
-        return {
-          question: `${product} ÷ ${num1} =`,
-          answer: num2,
-        };
-
-      case "mixed":
-        const isMultiplication = Math.random() > 0.5;
-        if (isMultiplication) {
-          return {
-            question: `${num1} × ${num2} =`,
-            answer: num1 * num2,
-          };
-        } else {
-          const product = num1 * num2;
-          return {
-            question: `${product} ÷ ${num1} =`,
-            answer: num2,
-          };
-        }
-
-      default: // multiplication
-        return {
-          question: `${num1} × ${num2} =`,
-          answer: num1 * num2,
-        };
+    if (currentMode === "division") {
+      const product = num1 * num2;
+      return {
+        question: `${product} ÷ ${num1} =`,
+        answer: num2,
+      };
     }
+
+    if (currentMode === "mixed") {
+      return Math.random() > 0.5
+        ? { question: `${num1} × ${num2} =`, answer: num1 * num2 }
+        : { question: `${num1 * num2} ÷ ${num1} =`, answer: num2 };
+    }
+
+    return {
+      question: `${num1} × ${num2} =`,
+      answer: num1 * num2,
+    };
   }
 
-  // Отображение вопроса
-  function displayQuestion() {
-    if (isTimerExpired) return;
+  // Запуск игры
+  function startGame() {
+    if (isTimerRunning) return;
+
+    resetGame();
+    isTimerRunning = true;
+    timeLeft = 60;
+
+    // Удаляем кнопку старта
+    const existingBtn = timerElement.parentNode.querySelector(".btn_timer");
+    if (existingBtn) {
+      existingBtn.remove();
+    }
+
+    updateTimerDisplay();
+    showQuestion();
+    startTimer();
+  }
+
+  // Таймер
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+  }
+
+  // Обновление таймера
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerElement.textContent = `${minutes}:${
+      seconds < 10 ? "0" : ""
+    }${seconds}`;
+  }
+
+  // Показ вопроса
+  function showQuestion() {
     const { question, answer } = generateQuestion();
     questionElement.textContent = question;
-    answerInput.value = "";
     currentAnswer = answer;
+    answerInput.value = "";
     resultIcon.textContent = "";
     answerInput.focus();
   }
 
   // Проверка ответа
   function checkAnswer() {
+    if (!isTimerRunning) return;
+
     const userAnswer = answerInput.value.trim();
 
-    if (userAnswer === "") {
+    if (!userAnswer) {
       resultIcon.textContent = "Введите ответ!";
       resultIcon.style.color = "red";
       return;
     }
 
-    const numericAnswer = parseInt(userAnswer);
-    let scoreRight = parseInt(resultRight.textContent);
-    let scoreWrong = parseInt(resultWrong.textContent);
+    const answerNum = parseInt(userAnswer);
+    const isCorrect = answerNum === currentAnswer;
 
-    if (numericAnswer === currentAnswer) {
-      scoreRight++;
+    if (isCorrect) {
+      rightAnswersElement.textContent =
+        parseInt(rightAnswersElement.textContent) + 1;
       resultIcon.textContent = "✔️";
       resultIcon.style.color = "green";
     } else {
-      scoreWrong++;
+      wrongAnswersElement.textContent =
+        parseInt(wrongAnswersElement.textContent) + 1;
+      mistakes.push({
+        question: questionElement.textContent,
+        userAnswer: answerNum,
+        correctAnswer: currentAnswer,
+      });
       resultIcon.textContent = "❌";
       resultIcon.style.color = "red";
     }
 
-    resultRight.textContent = scoreRight;
-    resultWrong.textContent = scoreWrong;
-
-    setTimeout(displayQuestion, 500);
+    setTimeout(showQuestion, 500);
   }
 
-  // Запуск таймера
-  function startTimer() {
-    if (startButton.parentNode === timerDisplay) {
-      timerDisplay.removeChild(startButton);
-    }
+  // Завершение игры
+  function endGame() {
+    clearInterval(timerInterval);
+    isTimerRunning = false;
 
-    displayQuestion();
+    // Блокируем ввод
+    answerButton.disabled = true;
+    answerInput.disabled = true;
 
-    function updateTimer() {
-      const minutes = Math.floor(durationInSeconds / 60);
-      const seconds = durationInSeconds % 60;
+    // Показываем результаты
+    showResults();
 
-      timerDisplay.textContent = `${minutes < 10 ? "0" : ""}${minutes}:${
-        seconds < 10 ? "0" : ""
-      }${seconds}`;
+    // Добавляем кнопку "Играть снова"
+    const restartBtn = document.createElement("button");
+    restartBtn.className = "btn_timer";
+    restartBtn.innerHTML =
+      "<span></span><span></span><span></span><span></span>Играть снова";
+    restartBtn.addEventListener("click", startGame);
 
-      if (--durationInSeconds < 0) {
-        clearInterval(timerInterval);
-        timerDisplay.innerHTML =
-          'Время вышло! <button class="btn_timer"><span></span><span></span><span></span><span></span>Играть ещё</button>';
-        timerDisplay.style.fontFamily = "Caveat";
-        timerDisplay.style.color = "red";
-
-        isTimerExpired = true;
-        answerButton.disabled = true;
-        answerInput.disabled = true;
-        showAnswer();
-
-        // Перепривязываем обработчик к новой кнопке
-        document
-          .querySelector(".btn_timer")
-          .addEventListener("click", startGame);
-      }
-    }
-
-    updateTimer();
-    timerInterval = setInterval(updateTimer, 1000);
+    timerElement.innerHTML = "Время вышло! ";
+    timerElement.appendChild(restartBtn);
+    timerElement.style.color = "red";
   }
 
   // Показ результатов
-  function showAnswer() {
-    const scoreAll =
-      parseInt(resultRight.textContent) + parseInt(resultWrong.textContent);
-    const scoreRight = parseInt(resultRight.textContent);
-    textResult.textContent = `Ваш результат ${scoreRight} из ${scoreAll}`;
-    textResult.style.color = "red";
+  function showResults() {
+    const total =
+      parseInt(rightAnswersElement.textContent) +
+      parseInt(wrongAnswersElement.textContent);
+    resultTextElement.textContent = `Результат: ${rightAnswersElement.textContent} из ${total}`;
+    resultTextElement.style.color = "red";
+
+    // Для десктопов
+    if (window.innerWidth > 768) {
+      if (imageContainer) imageContainer.style.display = "none";
+      if (mistakesContainer) mistakesContainer.classList.add("visible");
+    }
+    // Для мобильных
+    else {
+      const mobileMistakes = document.getElementById(
+        "mobile-mistakes-container"
+      );
+      if (!mobileMistakes) {
+        createMobileMistakesContainer();
+      }
+      document
+        .getElementById("mobile-mistakes-container")
+        .classList.add("visible");
+    }
+
+    // Заполняем список ошибок
+    const list =
+      window.innerWidth > 768
+        ? mistakesList
+        : document.getElementById("mobile-mistakes-list");
+    list.innerHTML =
+      mistakes.length > 0
+        ? mistakes
+            .map(
+              (mistake, i) => `
+              <div class="mistake-item">
+                  <strong>${i + 1}.</strong> ${mistake.question}<br>
+                  Ваш ответ: <span style="color:red">${
+                    mistake.userAnswer
+                  }</span><br>
+                  Правильно: <span style="color:green">${
+                    mistake.correctAnswer
+                  }</span>
+              </div>
+          `
+            )
+            .join("")
+        : "<p>Вы не сделали ни одной ошибки! 👍</p>";
+  }
+
+  // Создаем контейнер для ошибок на мобильных
+  function createMobileMistakesContainer() {
+    const container = document.createElement("div");
+    container.id = "mobile-mistakes-container";
+    container.innerHTML = `
+          <h3>Ошибки:</h3>
+          <div id="mobile-mistakes-list"></div>
+      `;
+    document.querySelector("#left").appendChild(container);
   }
 
   // Сброс игры
   function resetGame() {
     clearInterval(timerInterval);
-    isTimerExpired = false;
-    durationInSeconds = 60;
-    timerDisplay.innerHTML =
-      '01:00<button class="btn_timer"><span></span><span></span><span></span><span></span>Старт</button>';
-    timerDisplay.style.fontFamily = "";
-    timerDisplay.style.color = "";
-    resultRight.textContent = "0";
-    resultWrong.textContent = "0";
-    textResult.textContent = "";
-    textResult.style.color = "";
-    answerButton.disabled = false;
-    answerInput.disabled = false;
-    resultIcon.textContent = "";
+    isTimerRunning = false;
+    timeLeft = 60;
+    mistakes = [];
+
+    // Сброс интерфейса
+    timerElement.innerHTML = "01:00"; // Оставляем только время
+
+    // Удаляем старую кнопку, если она есть
+    const existingBtn = timerElement.parentNode.querySelector(".btn_timer");
+    if (existingBtn) {
+      existingBtn.remove();
+    }
+
+    // Добавляем новую кнопку
+    const newStartBtn = startButton.cloneNode(true);
+    timerElement.parentNode.appendChild(newStartBtn);
+    newStartBtn.addEventListener("click", startGame);
+
+    // Остальной сброс состояния
     questionElement.textContent = "";
     answerInput.value = "";
+    resultIcon.textContent = "";
+    rightAnswersElement.textContent = "0";
+    wrongAnswersElement.textContent = "0";
+    resultTextElement.textContent = "";
+    answerButton.disabled = false;
+    answerInput.disabled = false;
+    timerElement.style.color = "";
 
-    // Перепривязываем обработчик к кнопке
-    document.querySelector(".btn_timer").addEventListener("click", startGame);
+    // Восстанавливаем изображение (для десктопа)
+    if (window.innerWidth > 768 && imageContainer) {
+      imageContainer.style.display = "block";
+    }
+    if (mistakesContainer) {
+      mistakesContainer.classList.remove("visible");
+    }
+
+    // Скрываем мобильный контейнер с ошибками
+    const mobileMistakes = document.getElementById("mobile-mistakes-container");
+    if (mobileMistakes) {
+      mobileMistakes.classList.remove("visible");
+    }
   }
 
-  // Запуск игры
-  function startGame() {
-    resetGame();
-    startTimer();
-  }
-
-  // Обработчики событий
+  // Инициализация обработчиков
   startButton.addEventListener("click", startGame);
   answerButton.addEventListener("click", checkAnswer);
-  answerInput.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      checkAnswer();
-    }
+  answerInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") checkAnswer();
   });
 });
