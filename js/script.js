@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const imageContainer = document.getElementById("image");
   const mistakesContainer = document.getElementById("mistakes-container");
   const mistakesList = document.getElementById("mistakes-list");
+  const modeTitleElement = document.querySelector(".h2"); // Добавлен элемент заголовка
 
   // Переменные игры
   let currentMode = "multiplication";
@@ -21,6 +22,23 @@ document.addEventListener("DOMContentLoaded", function () {
   let timeLeft = 60;
   let mistakes = [];
 
+  // Функция обновления заголовка режима
+  function updateModeTitle() {
+    switch (currentMode) {
+      case "multiplication":
+        modeTitleElement.textContent = "Тренажёр умножения";
+        break;
+      case "division":
+        modeTitleElement.textContent = "Тренажёр деления";
+        break;
+      case "mixed":
+        modeTitleElement.textContent = "Смешанный тренажёр";
+        break;
+      default:
+        modeTitleElement.textContent = "Тренажёр таблицы умножения";
+    }
+  }
+
   // Инициализация кнопок режимов
   document.querySelectorAll(".mode-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
@@ -28,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelectorAll(".mode-btn").forEach((b) => {
         b.classList.toggle("active", b.dataset.mode === currentMode);
       });
+      updateModeTitle(); // Обновляем заголовок при смене режима
       resetGame();
     });
   });
@@ -237,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
     mistakes = [];
 
     // Сброс интерфейса
-    timerElement.innerHTML = "01:00"; // Оставляем только время
+    timerElement.innerHTML = "01:00";
 
     // Удаляем старую кнопку, если она есть
     const existingBtn = timerElement.parentNode.querySelector(".btn_timer");
@@ -277,6 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Инициализация обработчиков
+  updateModeTitle(); // Устанавливаем заголовок при загрузке
   startButton.addEventListener("click", startGame);
   answerButton.addEventListener("click", checkAnswer);
   answerInput.addEventListener("keydown", (e) => {
